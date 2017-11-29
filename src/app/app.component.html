@@ -2,7 +2,10 @@
 <div class="launch-map"
      leaflet
      [leafletOptions]="options"
-     (leafletMapReady)="onMapReady($event)">
+     (leafletMapReady)="onMapReady($event)"
+     leafletMarkerCluster
+     [leafletMarkerClusterOptions]="markerClusterOptions"
+     (leafletMarkerClusterReady)="markerClusterReady($event)">
 </div>
 
 <mat-toolbar>

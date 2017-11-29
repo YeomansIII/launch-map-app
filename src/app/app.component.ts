@@ -1,7 +1,8 @@
 import {Component, ViewEncapsulation} from '@angular/core';
 import {circle, latLng, polygon, tileLayer, Map as LeafletMap, point, marker} from 'leaflet';
+import {HttpClient} from '@angular/common/http';
 
-declare const L: any;
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,8 @@ declare const L: any;
 })
 export class AppComponent {
   title = 'app';
+  launches: any;
+  launchesGeoJsonLayer: any;
   // mapBounds = new L.LatLngBounds(
   //   [0, 4352],
   //   [2048, 0]);
@@ -55,6 +58,10 @@ export class AppComponent {
     }
   };
 
+  constructor(private http: HttpClient) {
+
+  }
+
   onMapReady(map: LeafletMap) {
     const mapBounds = new L.LatLngBounds(
       [90, 180],
@@ -69,5 +76,33 @@ export class AppComponent {
       position: 'bottomright'
     }).addTo(map);
     L.control.layers(this.layersControl.baseLayers, this.layersControl.overlays, {position: 'bottomright'}).addTo(map);
+  }
+
+  markerClusterReady(markerCluster: L.LayerGroup) {
+    const query = 'https://yeomansiii.carto.com:443/api/v2/sql?format=GeoJSON&q=select * from public.launches';
+
+    const geojsonMarkerOptions = {
+      radius: 8,
+      fillColor: '#ff7800',
+      color: '#000',
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    };
+
+    this.http.get(query).subscribe(
+      (data: any) => {
+        console.log(data);
+        this.launches = data;
+        this.launchesGeoJsonLayer = new L.GeoJSON(data, {
+          pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, geojsonMarkerOptions);
+          },
+          onEachFeature: function (feature, layer) {
+            // add popup with info
+            layer.bindPopup(`<h2>${(feature.properties as any).mission}</h2>`);
+          }
+        }).addTo(markerCluster);
+      });
   }
 }
