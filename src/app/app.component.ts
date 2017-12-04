@@ -1,8 +1,12 @@
 import {Component, ViewEncapsulation} from '@angular/core';
-import {circle, latLng, polygon, tileLayer, Map as LeafletMap, point, marker} from 'leaflet';
+import {circle, latLng, polygon, tileLayer, Map as LeafletMap, point, marker, PointExpression, Point} from 'leaflet';
 import {HttpClient} from '@angular/common/http';
 
 import * as L from 'leaflet';
+import * as moment from 'moment';
+import 'leaflet.timeline';
+import '../../node_modules/leaflet-timedimension/dist/leaflet.timedimension.src.js';
+import '../../node_modules/leaflet.timeline/dist/leaflet.timeline.js';
 
 @Component({
   selector: 'app-root',
@@ -12,11 +16,13 @@ import * as L from 'leaflet';
 })
 export class AppComponent {
   title = 'app';
+  map: LeafletMap;
+  markerCluster: any;
+  timeDimension: any;
   launches: any;
   launchesGeoJsonLayer: any;
-  // mapBounds = new L.LatLngBounds(
-  //   [0, 4352],
-  //   [2048, 0]);
+  query = 'https://yeomansiii.carto.com:443/api/v2/sql?format=GeoJSON&q=select * from public.launches';
+
   rocketIcon = L.icon({
     iconUrl: '/assets/images/rocket_icon.png',
     iconSize: [90, 90],
@@ -32,7 +38,8 @@ export class AppComponent {
     minZoom: 2,
     noWrap: true,
     continuousWorld: false,
-    center: latLng(20, 0)
+    center: latLng(20, 0),
+    timeDimension: true
   };
   layersControl = {
     baseLayers: {
@@ -57,12 +64,23 @@ export class AppComponent {
       '1247, 1': marker([-90, -180], {icon: this.rocketIcon})
     }
   };
+  divIcon = L.divIcon({
+    className: 'marker',
+    html: '<div class="map-marker flash-marker"></div>',
+    // Set marker width and height
+    iconSize: [22, 22]
+  });
+  icon = L.icon({
+    iconUrl: 'assets/images/rocket_icon.png',
+    iconSize: new Point(40, 40)
+  });
 
   constructor(private http: HttpClient) {
 
   }
 
   onMapReady(map: LeafletMap) {
+    this.map = map;
     const mapBounds = new L.LatLngBounds(
       [90, 180],
       [-90, -180]);
@@ -76,33 +94,68 @@ export class AppComponent {
       position: 'bottomright'
     }).addTo(map);
     L.control.layers(this.layersControl.baseLayers, this.layersControl.overlays, {position: 'bottomright'}).addTo(map);
-  }
+    // (L.control as any).timeDimension().addTo(map);
+    const timelineControl = L.timelineSliderControl({
+      formatOutput: function (date) {
+        return moment(date).format('MMMM, DD, YYYY');
+      },
+      steps: 10000
+    });
 
-  markerClusterReady(markerCluster: L.LayerGroup) {
-    const query = 'https://yeomansiii.carto.com:443/api/v2/sql?format=GeoJSON&q=select * from public.launches';
-
-    const geojsonMarkerOptions = {
-      radius: 8,
-      fillColor: '#ff7800',
-      color: '#000',
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    };
-
-    this.http.get(query).subscribe(
+    this.http.get(this.query).subscribe(
       (data: any) => {
         console.log(data);
         this.launches = data;
-        this.launchesGeoJsonLayer = new L.GeoJSON(data, {
-          pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, geojsonMarkerOptions);
+        this.launchesGeoJsonLayer = new L.timeline(data, {
+          pointToLayer: (feature, latlng) => {
+            return L.marker(latlng, {icon: this.divIcon});
           },
-          onEachFeature: function (feature, layer) {
+          onEachFeature: (feature, layer) => {
             // add popup with info
             layer.bindPopup(`<h2>${(feature.properties as any).mission}</h2>`);
+          },
+          getInterval: (feature) => {
+            return {
+              start: moment(feature.properties.time).unix(),
+              end: moment(feature.properties.time).unix() + 2000000
+            };
           }
-        }).addTo(markerCluster);
+        });
+        timelineControl.addTo(map);
+        timelineControl.addTimelines(this.launchesGeoJsonLayer);
+        this.launchesGeoJsonLayer.addTo(map);
+        console.log(timelineControl);
+        console.log(this.launchesGeoJsonLayer);
+        // const timeDimension = L.timeDimension.layer.geoJson(this.launchesGeoJsonLayer, {duration: 'P3W'});
+        // timeDimension.addTo(markerCluster);
+        // (new L.TimeDimension.Player({}, timeDimension)).addTo(map);
       });
   }
+
+  // markerClusterReady(markerCluster: L.LayerGroup) {
+  //   this.markerCluster = markerCluster;
+  //   this.http.get(this.query).subscribe(
+  //     (data: any) => {
+  //       console.log(data);
+  //       this.launches = data;
+  //       this.launchesGeoJsonLayer = new L.GeoJSON(data, {
+  //         pointToLayer: (feature, latlng) => {
+  //           return L.marker(latlng, {icon: this.icon});
+  //         },
+  //         onEachFeature: (feature, layer) => {
+  //           // add popup with info
+  //           layer.bindPopup(`<h2>${(feature.properties as any).mission}</h2>`);
+  //         }
+  //       });
+  //       // timelineControl.addTimelines(this.launchesGeoJsonLayer);
+  //       // this.launchesGeoJsonLayer.addTo(map);
+  //       this.timeDimension = L.timeDimension.layer.geoJson(this.launchesGeoJsonLayer, {duration: 'P2W'});
+  //       markerCluster.addLayer(this.timeDimension);
+  //       // this.timeDimension.on('timeload', () => {
+  //       //   console.log('event!');
+  //       // });
+  //       // timeDimension.addTo(markerCluster);
+  //       // (new L.TimeDimension.Player({}, timeDimension)).addTo(map);
+  //     });
+  // }
 }

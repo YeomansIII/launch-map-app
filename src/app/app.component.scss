@@ -16,3 +16,30 @@
   height: 90px;
   background-color: cyan;
 }
+
+.map-marker {
+  height: 12px;
+  width: 12px;
+  background-color: rgba(200, 100, 100, 0.7);
+  border: 1px solid black;
+  border-radius: 100%;
+}
+
+.flash-marker {
+  animation-duration: 1s;
+  animation-name: flash;
+}
+
+@keyframes flash {
+  0% {
+    transform: scale(1, 1)
+  }
+
+  50% {
+    transform: scale(3, 3)
+  }
+
+  100% {
+    transform: scale(1, 1)
+  }
+}
