@@ -5,7 +5,6 @@ import {AppComponent} from './app.component';
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {LaunchMaterialModule} from './custom-modules/material.module';
 import {HttpClientModule} from '@angular/common/http';
-import {LeafletMarkerClusterModule} from '@asymmetrik/ngx-leaflet-markercluster';
 
 
 @NgModule({
@@ -16,7 +15,6 @@ import {LeafletMarkerClusterModule} from '@asymmetrik/ngx-leaflet-markercluster'
     BrowserModule,
     HttpClientModule,
     LeafletModule.forRoot(),
-    LeafletMarkerClusterModule.forRoot(),
     LaunchMaterialModule
   ],
   providers: [],

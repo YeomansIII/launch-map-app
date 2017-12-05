@@ -6,9 +6,96 @@
 </div>
 
 <mat-toolbar>
-  <h1>Launch Map</h1>
+  <img src="assets/images/globe_emoji.png" class="toolbar-image"/>
+  <img src="assets/images/rocket_emoji.png" class="toolbar-image"/>
+  <h1>Orbital Rocket Launches 1998-1999</h1>
+  <div class="spacer"></div>
+  <a mat-raised-button
+     href="https://yeomansiii.carto.com:443/api/v2/sql?format=GeoJSON&q=select%20*%20from public.launches&format=CSV">
+    <mat-icon>file_download</mat-icon>
+    Download CSV
+  </a>
 </mat-toolbar>
 
+<div class="orbits">
+  <h3>Orbits</h3>
+  <ul>
+    <li>
+      EEO: {{orbits['EEO/M']}}
+    </li>
+    <li>
+      FTO: {{orbits['FTO']}}
+    </li>
+    <li>
+      FSO: {{orbits['FSO']}}
+    </li>
+    <li>
+      GTO: {{orbits['GTO'] + orbits['GTO+'] + orbits['GTO-']}}
+    </li>
+    <li>
+      GEO: {{orbits['GEO']}}
+    </li>
+    <li>
+      HCO: {{orbits['HCO']}}
+    </li>
+    <li>
+      HTO: {{orbits['HTO']}}
+    </li>
+    <li>
+      LEO: {{orbits['LEO']}}
+    </li>
+    <li>
+      LEO/S: {{orbits['LEO/S']}}
+    </li>
+    <li>
+      LEO/P: {{orbits['LEO/P']}}
+    </li>
+    <li>
+      MEO: {{orbits['MEO']}}
+    </li>
+    <li>
+      MTO: {{orbits['MTO']}}
+    </li>
+  </ul>
+</div>
+
+<div class="search-field">
+  <button mat-raised-button color="primary" (click)="vehicleSearch(vehicleSearchInput.value)">Search</button>
+  <input #vehicleSearchInput placeholder="Vehicle search"/>
+</div>
+
 <div class="bottom-bar">
-  <h1>Launch Map</h1>
+  <div class="controls">
+    <button mat-button class="icon" color="primary"
+            (click)="timelineControl.prev()">
+      <mat-icon>skip_previous</mat-icon>
+    </button>
+    <button mat-button class="icon" color="primary"
+            (click)="timelineControl.toggle()">
+      <mat-icon>{{timelineControl._playing ? 'pause' : 'play_arrow'}}</mat-icon>
+    </button>
+    <button mat-button class="icon" color="primary"
+            (click)="timelineControl.next()">
+      <mat-icon>skip_next</mat-icon>
+    </button>
+  </div>
+  <div style="flex-grow: 1">
+    <mat-slider
+      color="primary"
+      class="timeline-slider"
+      [disabled]="timelineSlider.disabled"
+      [invert]="timelineSlider.invert"
+      [max]="timelineSlider.max"
+      [min]="timelineSlider.min"
+      [step]="timelineSlider.step"
+      [thumb-label]="timelineSlider.thumbLabel"
+      [tick-interval]="timelineSlider.tickInterval"
+      [value]="timelineSlider.value"
+      (input)="slideTimeline($event)">
+    </mat-slider>
+  </div>
+  <div class="controls">
+    <button mat-raised-button (click)="toggleTimeline()" color="primary">Show {{timelineMode ? 'All' : 'Timeline'}}
+    </button>
+  </div>
 </div>

@@ -8,19 +8,120 @@
   margin-bottom: 90px;
 }
 
+.spacer {
+  flex: 1 1 auto;
+}
+
+.toolbar-image {
+  height: 80%;
+  width: auto;
+  padding: 5px;
+}
+
+.orbits {
+  position: fixed;
+  left: 0;
+  top: 64px;
+  padding: 0 15px;
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 100px;
+  ul {
+    padding: 0;
+  }
+  li {
+    list-style: none;
+  }
+}
+
+.search-field {
+  position: fixed;
+  bottom: 150px;
+  left: 10px;
+  input {
+    padding: 9px;
+    margin-left: 6px;
+    font-size: 14px;
+    border-radius: 2px;
+    border: none;
+  }
+}
+
 .bottom-bar {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   height: 90px;
-  background-color: cyan;
+  background-color: #69f0ae;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .timeline-slider {
+    margin-top: 30px;
+    width: 100%;
+    .mat-slider-thumb-container {
+      position: absolute;
+      z-index: 1;
+      transition: none;
+    }
+    .mat-slider-wrapper,
+    .mat-slider-track-wrapper,
+    .mat-slider-track-wrapper div,
+    .mat-slider-ticks-container,
+    .mat-slider-ticks-container div {
+      height: 10px;
+    }
+  }
+  .controls {
+    display: inline;
+    padding: 0 15px;
+    .mat-icon {
+      height: initial;
+      width: initial;
+      font-size: 32px;
+    }
+  }
+}
+
+.leaflet-timeline-control {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 90px !important;
+  width: 100vw !important;
+  margin: 0 !important;
+}
+
+.time-text {
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  padding: 10px;
+  font-size: 25pt;
+}
+
+.mat-slider-thumb-label {
+  width: 100px;
+  transform: scale(1) rotate(45deg) !important;
+  .mat-slider-thumb-label-text {
+    display: none;
+  }
+}
+
+.leaflet-popup-content {
+  ul {
+    padding: 0;
+  }
+  li {
+    list-style: none;
+  }
 }
 
 .map-marker {
   height: 12px;
   width: 12px;
-  background-color: rgba(200, 100, 100, 0.7);
+  background-color: rgba(105, 240, 174, 0.9);
   border: 1px solid black;
   border-radius: 100%;
 }
@@ -36,7 +137,7 @@
   }
 
   50% {
-    transform: scale(3, 3)
+    transform: scale(4, 4)
   }
 
   100% {
